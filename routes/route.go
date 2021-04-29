@@ -1,8 +1,7 @@
 package routes
 
 import (
-
-	// "project/controllers"
+	"project/controllers"
 	mid "project/middleware"
 
 	"github.com/labstack/echo"
@@ -11,8 +10,8 @@ import (
 func New() *echo.Echo {
 	e := echo.New()
 	mid.LogMiddleware(e)
-	// e.POST("/users", controllers.CreateUsersController)
-	// e.POST("/login", controllers.LoginUsersController)
+	e.POST("/users", controllers.CreateUsersController)
+	e.POST("/login", controllers.LoginUsersController)
 	// e.GET("/product", controllers.GetProductController)
 	// // e.GET("/users", controllers.GetUsersController)
 
