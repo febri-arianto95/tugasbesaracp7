@@ -21,6 +21,9 @@ type CartRequest struct {
 	IDProduct uint `json:"id_product", form:"id_product"`
 	Quantity  uint `json:"quantity", form:"quantity"`
 }
+type CartRequestUpdate struct {
+	Quantity uint `json:"quantity", form:"quantity"`
+}
 type CartResponseAny struct {
 	Code    int    `json:"code", form:"code"`
 	Message string `json:"message", form:"message"`

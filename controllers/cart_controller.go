@@ -96,3 +96,24 @@ func DeleteCartController(c echo.Context) error {
 		Status:  "success",
 	})
 }
+func UpdateCartController(c echo.Context) error {
+	var cartInput models.CartRequestUpdate
+	c.Bind(&cartInput)
+	userId := middleware.ExtractUserIdFromJWT(c)
+	cartId := c.Param("id")
+	var cartDB []models.Cart
+	configs.DB.Where("id = ? AND id_user = ?", cartId, userId).Find(&cartDB).Update("Quantity", cartInput.Quantity)
+	err_cart := configs.DB.Where("id = ? AND id_user = ?", cartId, userId).Save(&cartDB).Error
+	if err_cart != nil {
+		return c.JSON(http.StatusInternalServerError, models.ResponseNotif{
+			Code:    http.StatusInternalServerError,
+			Message: err_cart.Error(),
+			Status:  "error",
+		})
+	}
+	return c.JSON(http.StatusOK, models.ResponseNotif{
+		Code:    http.StatusOK,
+		Message: "Updated success",
+		Status:  "success",
+	})
+}
