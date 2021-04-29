@@ -45,6 +45,12 @@ func CreateCartController(c echo.Context) error {
 	cartDB.Users = userDB
 	cartDB.Product = productDB
 
+	cartDB.Product.Category.ID = cartDB.Product.IDCategory
+	cartDB.Product.Category.Name = cartDB.Product.Name
+	cartDB.Product.Category.CreatedAt = cartDB.Product.CreatedAt
+	cartDB.Product.Category.UpdatedAt = cartDB.Product.UpdatedAt
+	cartDB.Product.Category.DeletedAt = cartDB.Product.DeletedAt
+
 	err := configs.DB.Save(&cartDB).Error
 	if err != nil {
 		return c.JSON(http.StatusInternalServerError, models.ResponseNotif{
