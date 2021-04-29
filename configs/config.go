@@ -2,7 +2,6 @@ package configs
 
 import (
 	"fmt"
-	"project/models"
 
 	"gorm.io/driver/mysql"
 	"gorm.io/gorm"
@@ -12,7 +11,7 @@ const DB_USER = "root"
 const DB_PASS = ""
 const DB_HOST = "127.0.0.1"
 const DB_PORT = "3306"
-const DB_NAME = "alta-store"
+const DB_NAME = "alta-store-db"
 
 var DB *gorm.DB
 
@@ -29,7 +28,7 @@ func InitDB() {
 }
 
 func InitMigrate() {
-	DB.AutoMigrate(&models.User{})
+	// DB.AutoMigrate(&models.User{})
 	// DB.AutoMigrate(&models.Transaction{})
 	// DB.AutoMigrate(&models.DetailTransaction{})
 	// DB.AutoMigrate(&models.Product{})
