@@ -22,6 +22,10 @@ func New() *echo.Echo {
 	jwt.GET("/cart", controllers.GetCartController)
 	jwt.DELETE("/cart/:id", controllers.DeleteCartController)
 	jwt.PUT("/cart/:id", controllers.DeleteCartController)
+	jwt.POST("/checkout", controllers.CreateCheckoutController)
+	jwt.GET("/checkout", controllers.GetCheckoutController)
+	jwt.POST("/payment", controllers.PaymentController)
+	jwt.GET("/payment", controllers.GetPaymentController)
 
 	return e
 }

@@ -34,6 +34,9 @@ type DetailTransaction struct {
 type CheckoutRequest struct {
 	IDCart uint `json:"id_cart", form:"id_cart"`
 }
+type PaymentRequest struct {
+	IDTransaction uint `json:"id_transaction", form:"id_transaction"`
+}
 type TransactionResponseAny struct {
 	Code    int         `json:"code", form:"code"`
 	Message string      `json:"message", form:"message"`

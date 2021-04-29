@@ -1,16 +1,16 @@
 package controllers
 
 import (
-	"fmt"
 	"net/http"
 	"project/configs"
 	"project/middleware"
 	"project/models"
 
 	"github.com/labstack/echo"
+	"gorm.io/gorm/clause"
 )
 
-func CreateTransactionController(c echo.Context) error {
+func CreateCheckoutController(c echo.Context) error {
 	//data user
 	userId := middleware.ExtractUserIdFromJWT(c)
 	var userDB models.User
@@ -27,6 +27,14 @@ func CreateTransactionController(c echo.Context) error {
 	var input models.CheckoutRequest
 	c.Bind(&input)
 	var cartDB models.Cart
+	row_cartDB := configs.DB.Find(&cartDB, input.IDCart).RowsAffected
+	if row_cartDB == 0 {
+		return c.JSON(http.StatusInternalServerError, models.ResponseNotif{
+			Code:    http.StatusInternalServerError,
+			Message: "Invalid id cart",
+			Status:  "error",
+		})
+	}
 	err_cartDB := configs.DB.Find(&cartDB, input.IDCart).Error
 	if err_cartDB != nil {
 		return c.JSON(http.StatusInternalServerError, models.ResponseNotif{
@@ -48,29 +56,12 @@ func CreateTransactionController(c echo.Context) error {
 		})
 	}
 	productPrice := productDB.Price
+	productId := productDB.ID
 
-	//max id transaction
-	var maxId uint
-	row := configs.DB.Table("Transaction").Select("max(ID)").Row()
-	row.Scan(&maxId)
-	var trxDB models.Transaction
-	err_trxDB := configs.DB.Select("max(ID)").Find(&trxDB).Error
-	if err_trxDB != nil {
-		return c.JSON(http.StatusInternalServerError, models.ResponseNotif{
-			Code:    http.StatusInternalServerError,
-			Message: err_productDB.Error(),
-			Status:  "error",
-		})
-	}
-	//end of max id transaction
-	fmt.Println("ini max id=", maxId)
-	useId := maxId + 1
-	fmt.Println("ini id yg digunakan", useId)
 	//save data transaction
 	var transactionDB models.Transaction
 	STATUS := "checkout"
 	TOTAL := productPrice * productQuantity
-	// transactionDB.ID = useId
 	transactionDB.IDUser = uint(userId)
 	transactionDB.Status = STATUS
 	transactionDB.Total = TOTAL
@@ -85,49 +76,59 @@ func CreateTransactionController(c echo.Context) error {
 		})
 	}
 	//save detail transaksi
-	// var detailTrxDB models.DetailTransaction
-	// detailTrxDB.IDTransaction = 7
-	// detailTrxDB.IDProduct = 5
-	// detailTrxDB.Quantity = 2
-	// // detailTrxDB.Transactions = transactionDB
-	// // detailTrxDB.Product = productDB
-	// if err_detailTrxDB := configs.DB.Save(&detailTrxDB).Error; err_detailTrxDB != nil {
-	// 	return c.JSON(http.StatusInternalServerError, models.ResponseNotif{
-	// 		Code:    http.StatusInternalServerError,
-	// 		Message: err_detailTrxDB.Error(),
-	// 		Status:  "error",
-	// 	})
-	// }
+	var detailTrxDB models.DetailTransaction
+	detailTrxDB.IDTransaction = transactionDB.ID
+	detailTrxDB.IDProduct = productId
+	detailTrxDB.Quantity = productQuantity
+	detailTrxDB.Transactions = transactionDB
+	detailTrxDB.Product = productDB
+	if err_detailTrxDB := configs.DB.Save(&detailTrxDB).Error; err_detailTrxDB != nil {
+		return c.JSON(http.StatusInternalServerError, models.ResponseNotif{
+			Code:    http.StatusInternalServerError,
+			Message: err_detailTrxDB.Error(),
+			Status:  "error",
+		})
+	}
 
-	//load multi data detail transaction
-	// var detTrxDB []models.DetailTransaction
-	// err_detTrxDB := configs.DB.Find(&detTrxDB).Error
-	// if err_detTrxDB != nil {
-	// 	return c.JSON(http.StatusInternalServerError, models.ResponseNotif{
-	// 		Code:    http.StatusInternalServerError,
-	// 		Message: err_productDB.Error(),
-	// 		Status:  "error",
-	// 	})
-	// }
-	//end multi data detail transaction
-
-	//menambahkan load detail transaksi
-	// var loadTrxDB models.Transaction
-	// configs.DB.Find(&loadTrxDB, useId)
-	// loadTrxDB.Detail = detTrxDB
-	// configs.DB.Save(&loadTrxDB)
-	//end menambahkan load detail transaksi
+	//load data transaksi untuk di tampilkan
+	var loadTransactionDB models.Transaction
+	if err := configs.DB.Preload("User").Preload("Detail").Find(&loadTransactionDB, transactionDB.ID).Error; err != nil {
+		return c.JSON(http.StatusInternalServerError, models.ResponseNotif{
+			Code:    http.StatusInternalServerError,
+			Message: err.Error(),
+			Status:  "error",
+		})
+	}
 
 	//pengurangan stock
-	// configs.DB.Find(&productDB, cartDB.IDProduct)
-	// productDB.Stock = productDB.Stock - cartDB.Quantity
-	// configs.DB.Save(&productDB)
+	configs.DB.Find(&productDB, cartDB.IDProduct)
+	productDB.Stock = productDB.Stock - cartDB.Quantity
+	configs.DB.Save(&productDB)
 	//end pengurangan stok
 
 	return c.JSON(http.StatusOK, models.TransactionResponseAny{
 		Code:    http.StatusOK,
-		Message: "Success add checkout",
+		Message: "Success checkout",
 		Status:  "success",
-		// Data:    transactionDB,
+		Data:    loadTransactionDB,
+	})
+}
+func GetCheckoutController(c echo.Context) error {
+	userId := middleware.ExtractUserIdFromJWT(c)
+	STATUS := "checkout"
+	var transactionDB []models.Transaction
+	c.Bind(&transactionDB)
+	if err := configs.DB.Preload(clause.Associations).Where("id_user = ? AND status = ?", userId, STATUS).Find(&transactionDB).Error; err != nil {
+		return c.JSON(http.StatusInternalServerError, models.ResponseNotif{
+			Code:    http.StatusInternalServerError,
+			Message: err.Error(),
+			Status:  "success",
+		})
+	}
+	return c.JSON(http.StatusOK, models.TransactionResponseMany{
+		Code:    http.StatusOK,
+		Message: "List checkout",
+		Status:  "success",
+		Data:    transactionDB,
 	})
 }
