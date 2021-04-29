@@ -7,6 +7,7 @@ import (
 	"project/models"
 
 	"github.com/labstack/echo"
+	"gorm.io/gorm/clause"
 )
 
 func CreateCartController(c echo.Context) error {
@@ -55,6 +56,24 @@ func CreateCartController(c echo.Context) error {
 	return c.JSON(http.StatusOK, models.CartResponseAny{
 		Code:    http.StatusOK,
 		Message: "Success add cart",
+		Status:  "success",
+		Data:    cartDB,
+	})
+}
+func GetCartController(c echo.Context) error {
+	userId := middleware.ExtractUserIdFromJWT(c)
+	var cartDB []models.Cart
+	err_cart := configs.DB.Where("id_user = ?", userId).Preload(clause.Associations).Find(&cartDB).Error
+	if err_cart != nil {
+		return c.JSON(http.StatusInternalServerError, models.ResponseNotif{
+			Code:    http.StatusInternalServerError,
+			Message: err_cart.Error(),
+			Status:  "error",
+		})
+	}
+	return c.JSON(http.StatusOK, models.CartResponseMany{
+		Code:    http.StatusOK,
+		Message: "Success get data all cart",
 		Status:  "success",
 		Data:    cartDB,
 	})
