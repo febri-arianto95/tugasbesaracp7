@@ -6,6 +6,7 @@ import (
 	"gorm.io/gorm"
 )
 
+//DB Carts
 type Cart struct {
 	ID        uint           `json:"id", form:"id", gorm:"primarykey"`
 	CreatedAt time.Time      `json:"createdAt", form:"createdAt"`
