@@ -8,13 +8,13 @@ import (
 
 // DB Users
 type User struct {
-	ID        uint           `json:"id", form:"id", gorm:"primarykey"`
-	CreatedAt time.Time      `json:"createdAt", form:"createdAt"`
-	UpdatedAt time.Time      `json:"updatedAt", form:"updatedAt"`
-	DeletedAt gorm.DeletedAt `json:"deletedAt", form:"deletedAt", gorm:"index"`
-	Name      string         `json:"name", form:"name"`
-	Email     string         `json:"email", form:"email"`
-	Password  string         `json:"password", form:"password"`
+	ID        uint           `JSON:"id", form:"id", gorm:"primarykey"`
+	CreatedAt time.Time      `JSON:"createdAt", form:"createdAt"`
+	UpdatedAt time.Time      `JSON:"updatedAt", form:"updatedAt"`
+	DeletedAt gorm.DeletedAt `JSON:"deletedAt", form:"deletedAt", gorm:"index"`
+	Name      string         `JSON:"name", form:"name"`
+	Email     string         `JSON:"email", form:"email"`
+	Password  string         `JSON:"password", form:"password"`
 }
 
 type TokenResponse struct {
@@ -24,10 +24,14 @@ type TokenResponse struct {
 	Token string `json:"token", form:"token"`
 }
 
-type UserRequest struct {
-	Name     string `json:"name", form:"name", validate:"required"`
-	Email    string `json:"email", form:"email", validate:"required, email"`
-	Password string `json:"password", form:"password", validate:"required"`
+type UserRequestRegister struct {
+	Name     string `JSON:"name", form:"name"`
+	Email    string `JSON:"email", form:"email"`
+	Password string `JSON:"password", form:"password"`
+}
+type UserRequestLogin struct {
+	Email    string `JSON:"email", form:"email"`
+	Password string `JSON:"password", form:"password"`
 }
 
 type UserTokenResponseAny struct {
