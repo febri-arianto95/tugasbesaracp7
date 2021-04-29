@@ -2,6 +2,7 @@ package configs
 
 import (
 	"fmt"
+	"project/models"
 
 	"gorm.io/driver/mysql"
 	"gorm.io/gorm"
@@ -28,10 +29,10 @@ func InitDB() {
 }
 
 func InitMigrate() {
-	// DB.AutoMigrate(&models.User{})
-	// DB.AutoMigrate(&models.Transaction{})
-	// DB.AutoMigrate(&models.DetailTransaction{})
-	// DB.AutoMigrate(&models.Product{})
-	// DB.AutoMigrate(&models.Category{})
-	// DB.AutoMigrate(&models.Cart{})
+	DB.AutoMigrate(&models.User{})
+	DB.AutoMigrate(&models.Product{})
+	DB.AutoMigrate(&models.Category{})
+	DB.AutoMigrate(&models.Cart{})
+	DB.AutoMigrate(&models.Transaction{})
+	DB.AutoMigrate(&models.DetailTransaction{})
 }
