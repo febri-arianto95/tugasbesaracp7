@@ -15,6 +15,7 @@ func New() *echo.Echo {
 	e.GET("/product", controllers.GetProductController)
 	jwt := e.Group("")
 	jwt.POST("/product", controllers.CreateProductController)
+	jwt.POST("/cart", controllers.CreateCartController)
 
 	return e
 }
