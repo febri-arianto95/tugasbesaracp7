@@ -12,7 +12,6 @@ func New() *echo.Echo {
 	mid.LogMiddleware(e)
 	e.POST("/users", controllers.CreateUsersController)
 	e.POST("/login", controllers.LoginUsersController)
-<<<<<<< HEAD
 	e.GET("/product", controllers.GetProductController)
 	jwt := e.Group("")
 	jwt.POST("/product", controllers.CreateProductController)
@@ -21,7 +20,5 @@ func New() *echo.Echo {
 	jwt.DELETE("/cart/:id", controllers.DeleteCartController)
 	jwt.PUT("/cart/:id", controllers.DeleteCartController)
 
-=======
->>>>>>> user
 	return e
 }
