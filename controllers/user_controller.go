@@ -1,6 +1,7 @@
 package controllers
 
 import (
+	"fmt"
 	"net/http"
 	"project/configs"
 	"project/middleware"
@@ -11,7 +12,7 @@ import (
 )
 
 func CreateUsersController(c echo.Context) error {
-	var userInput models.UserRequest
+	var userInput models.UserRequestRegister
 	c.Bind(&userInput)
 	if userInput.Email == "" || userInput.Password == "" || userInput.Name == "" {
 		return c.JSON(http.StatusInternalServerError, models.ResponseNotif{
@@ -45,10 +46,19 @@ func CreateUsersController(c echo.Context) error {
 }
 
 func LoginUsersController(c echo.Context) error {
-	var userInput models.UserRequest
+	var userInput models.UserRequestLogin
 	c.Bind(&userInput)
+	if userInput.Email == "" || userInput.Password == "" {
+		return c.JSON(http.StatusInternalServerError, models.ResponseNotif{
+			Code:    http.StatusInternalServerError,
+			Message: "All input is required",
+			Status:  "error",
+		})
+	}
+	fmt.Println(userInput.Email)
+	fmt.Println(userInput.Password)
 	var userDB models.User
-	check_user := configs.DB.Where("email = ? AND password=?", userInput.Email, userInput.Password).Find(&userDB).RowsAffected
+	check_user := configs.DB.Where("email = ? AND password = ? ", userInput.Email, userInput.Password).Find(&userDB).RowsAffected
 	if check_user == 0 {
 		return c.JSON(http.StatusInternalServerError, models.ResponseNotif{
 			Code:    http.StatusInternalServerError,
