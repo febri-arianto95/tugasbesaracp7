@@ -10,8 +10,9 @@ import (
 func New() *echo.Echo {
 	e := echo.New()
 	mid.LogMiddleware(e)
-	e.POST("/product", controllers.CreateProductController)
 	e.GET("/product", controllers.GetProductController)
+	jwt := e.Group("")
+	jwt.POST("/product", controllers.CreateProductController)
 
 	return e
 }
